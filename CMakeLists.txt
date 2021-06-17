@@ -17,7 +17,9 @@ target_include_directories(
         $<INSTALL_INTERFACE:include/hlk/log>
 )
 
-add_subdirectory(test)
+if (BUILD_TEST)
+    add_subdirectory(test)
+endif()
 
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES 
