@@ -1,4 +1,4 @@
-#include "log.h"
+#include <hlk/log/log.h>
 
 int main(int argc, char* argv[]) {
     Hlk::Log::setPath("logs");
