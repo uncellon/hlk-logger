@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(HlkLog VERSION 1.0.1)
+project(HlkLogger VERSION 2.0.0)
 
 option(BUILD_EXAMPLES "Build examples" ON)
 
@@ -7,29 +7,29 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
-file(GLOB HEADERS include/hlk/log/*.h)
-file(GLOB SOURCES include/hlk/log/*.cpp)
+file(GLOB HEADERS include/hlk/logger/*.h)
+file(GLOB SOURCES include/hlk/logger/*.cpp)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
-add_library(Hlk::Log ALIAS ${PROJECT_NAME})
+add_library(Hlk::Logger ALIAS ${PROJECT_NAME})
 
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES 
         PUBLIC_HEADER "${HEADERS}"
-        EXPORT_NAME Log
+        EXPORT_NAME Logger
 )
 
 target_include_directories(
     ${PROJECT_NAME} INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include/hlk/log>
+        $<INSTALL_INTERFACE:include/hlk/logger>
 )
 
 install(
     TARGETS ${PROJECT_NAME}
     EXPORT ${PROJECT_NAME}Targets
     PUBLIC_HEADER
-        DESTINATION "include/hlk/log"
+        DESTINATION "include/hlk/logger"
     LIBRARY
         DESTINATION "lib"
 )
