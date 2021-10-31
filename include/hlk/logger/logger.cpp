@@ -28,39 +28,37 @@
 
 namespace Hlk {
 
-std::string Logger::m_levels[] = { "[info]", "[warn]", "[err]" };
 std::string Logger::m_path = "";
-std::string Logger::m_logfile = "common.log";
-unsigned int Logger::m_logSizeLimit = 0;
-unsigned int Logger::m_logsCountLimit = 1;
+unsigned int Logger::m_sizeLimit = 1000000; // Default limit - 1 MB
+unsigned int Logger::m_backupLimit = 1;
 
-void Logger::write(const std::string &msg, Level level, const std::string &logfile) {
+void Logger::write(const std::string &prefix, const std::string &message, const std::string &logfile) {
     // Get current date and time
     std::string currentDate = formatDate(), currentTime = formatTime();
 
     /* 
-        Form message, example:
-        2021-04-22 16:12:20 [info] - measured weight: 138g
+        Sample message:
+        2021-10-10 11:40:02 [info] - Measured weight: 138g.
     */
-    auto logMsg = 
-        currentDate + " " + currentTime + " " + m_levels[level] + " - " + msg;
+    auto logMessage = 
+        currentDate + " " + currentTime + " [" + prefix + "] - " + message;
 
     // Write to stdout
-    std::cout << logMsg << std::endl;
+    std::cout << logMessage << std::endl;
 
     // Skip writting to file if path is empty or message size is too long
-    if (m_path.empty() || logMsg.size() > m_logSizeLimit) {
+    if (!logfile.size() || logMessage.size() > m_sizeLimit) {
         return;
     }
 
     // Write to file
     std::ofstream fout(m_path + "/" + logfile, std::ios_base::app);
-    if (logMsg.size() + fout.tellp() > m_logSizeLimit) { // Rotate log file
+    if (logMessage.size() + fout.tellp() > m_sizeLimit) { // Rotate log file
         fout.close();
         rotate(logfile);
         fout.open(m_path + "/" + logfile, std::ios_base::app);
     }
-    fout << logMsg << std::endl;
+    fout << logMessage << std::endl;
     fout.close();
 }
 
@@ -72,6 +70,7 @@ void Logger::setPath(const std::string &path) {
     if (!pathExists) {
         bool pathCreated = std::filesystem::create_directory(path);
         if (!pathCreated) {
+            std::cerr << "Hlk::Logger - Failed to create log path\n";
             return;
         }
     }
@@ -79,12 +78,12 @@ void Logger::setPath(const std::string &path) {
     m_path = path;
 }
 
-void Logger::setLogsCountLimit(unsigned int count) {
+void Logger::setOldLogsLimit(unsigned int count) { 
     if (count == 0) {
-        std::cerr << "Hlk::Log - Logs limit must be greater than zero\n";
+        std::cerr << "Hlk::Logger - Logs backup limit must be greater than zero\n";
         return;
     }
-    m_logsCountLimit = count;
+    m_backupLimit = count; 
 }
 
 std::string Logger::formatTime() {
@@ -108,11 +107,12 @@ std::string Logger::formatDate() {
 
 void Logger::rotate(const std::string &filename) {
     auto filepath = m_path + "/" + filename;
-    std::filesystem::remove(filepath + "." + std::to_string(m_logsCountLimit - 1));
-    if (m_logsCountLimit == 1) {
+    std::filesystem::remove(filepath + "." + std::to_string(m_backupLimit - 1));
+    if (m_backupLimit == 1) {
+        std::filesystem::remove(filepath);
         return;
     }
-    for (int i = m_logsCountLimit - 1; i > 0; --i) {
+    for (int i = m_backupLimit - 1; i > 0; --i) {
         if (!std::filesystem::exists(filepath + "." + std::to_string(i))) {
             continue;
         }        

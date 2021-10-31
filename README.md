@@ -2,30 +2,43 @@
 
 - [Features](#features)
 - [Examples](#examples)
-    - [Simple log write](#simple-log-write)
+    - [Setting log path](#setting-log-path)
+    - [Setting log size limit](#setting-log-size-limit)
+    - [Setting old logs limit](#setting-old-logs-limit)
+    - [Write to stdout only](#write-to-stdout-only)
+    - [Write to stdout and log file](#write-to-stdout-and-log-file)
 
 ## <a name="features"></a> Features
 - Message printing to stdout
-- Message writing to logfile, if log path is setted
-- Few log message levels:
-    - information with *[info]* prefix
-    - warning with *[warn]* prefix
-    - error with *[err]* prefix
+- Message writing to file
+- Log rotate
 
 ## <a name="examples"></a> Examples
 
-### <a name="simple-log-write"></a> Simple log write
-You can write message to the log simply by calling the static "write" method, as you can see below:
-
+### <a name="setting-log-path"></a> Setting log path
 ```cpp
-Hlk::Logger::write("My log message");
+Hlk::Logger::setPath("log");
 ```
 
-The message that will be displayed on the screen may look like this:
-```
-2021-30-10 00:34 [info] - My log message
+### <a name="setting-log-size-limit"></a> Setting log size limit
+```cpp
+Hlk::Logger::setSizeLimit(10485760); // 10 MiB
 ```
 
+### <a name="setting-old-logs-limit"></a> Setting old logs limit
+```cpp
+Hlk::Logger::setOldLogsLimit(5);
+```
+
+### <a name="write-to-stdout-only"></a> Write to stdout only
+```cpp
+Hlk::Logger::write("info", "My message");
+```
+
+### <a name="write-to-stdout-and-log-file"></a> Write to stdout and log file
+```cpp
+Hlk::Logger::write("info", "My message", "common.log");
+```
 
 ## License
 <img align="right" src="https://www.gnu.org/graphics/lgplv3-with-text-154x68.png">

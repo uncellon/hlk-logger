@@ -29,51 +29,91 @@ namespace Hlk {
 
 class Logger {
 public:
-    enum Level {
-        kInfo,
-        kWarn,
-        kErr
-    };
+    /**************************************************************************
+     * Methods
+     *************************************************************************/
 
-    static void write(const std::string &msg, Level level = kInfo, const std::string &logfile = m_logfile);
+    /**
+     * @brief Write formatted message to stdout and file
+     * 
+     * Formatted message sample: 
+     * "2021-10-10 11:40:02 [info] - Measured weight: 138g."
+     * 
+     * If formatted message size bigger than sizeLimit(...), then message 
+     * will not be saved into the file
+     * 
+     * @param prefix The message prefix, printed in square brackets before the 
+     * message 
+     * @param message Main message
+     * @param logfile Log filename. If path(...) is empty, default path will be 
+     * used
+     */
+    static void write(const std::string &prefix, const std::string &message, const std::string &logfile = "");
+
+    /**************************************************************************
+     * Accessors / Mutators
+     *************************************************************************/
+
+    static std::string path();
     static void setPath(const std::string &path);
-    static void setLogSizeLimit(unsigned int bytes);
-    static void setLogsCountLimit(unsigned int count);
-    static void setDefaultLogfile(const std::string &logfile);
 
-    // Helpers
-    static void write(const char *msg, Level level = kInfo, const char *logfile = m_logfile.c_str());
+    static unsigned int sizeLimit();
+    static void setSizeLimit(unsigned int bytes);
+
+    static unsigned int oldLogsLimit();
+    static void setOldLogsLimit(unsigned int count);
+
+    /**************************************************************************
+     * Helpers
+     *************************************************************************/
+
+    static void write(const char *prefix, const char *message, const char *logfile);
+
+    static void path(const char *output);
     static void setPath(const char *path);
-    static void setDefaultLogfile(const char *logfile);
 
 protected:
+    /**************************************************************************
+     * Methods
+     *************************************************************************/
+
     static std::string formatTime();
     static std::string formatDate();
     static void rotate(const std::string &logfile);
 
-    static std::string m_levels[];
+    /**************************************************************************
+     * Members
+     *************************************************************************/
+
     static std::string m_path;
-    static std::string m_logfile;
-    static unsigned int m_logSizeLimit;
-    static unsigned int m_logsCountLimit;
+    static unsigned int m_sizeLimit;
+    static unsigned int m_backupLimit;
 
 }; // class Logger
 
-/*******************************************************************************
- * Inline
- ******************************************************************************/
+/******************************************************************************
+ * Inline definition: Accessors / Mutators
+ *****************************************************************************/
 
-inline void Logger::setLogSizeLimit(unsigned int bytes) { m_logSizeLimit = bytes; }
+inline std::string Logger::path() { return m_path; }
 
-inline void Logger::setDefaultLogfile(const std::string &logfile) { m_logfile = logfile; }
+inline unsigned int Logger::sizeLimit() { return m_sizeLimit; }
+inline void Logger::setSizeLimit(unsigned int bytes) { m_sizeLimit = bytes; }
 
-inline void Logger::setPath(const char *path) { setPath(std::string(path)); }
+inline unsigned int Logger::oldLogsLimit() { return m_backupLimit; }
 
-inline void Logger::write(const char *msg, Level level, const char *logfile) { 
-    write(std::string(msg), level, std::string(logfile)); 
+/******************************************************************************
+ * Inline definition: Helpers
+ *****************************************************************************/
+
+inline void Logger::write(const char *prefix, const char *message, const char *logfile) {
+    write(std::string(prefix), std::string(message), std::string(logfile));
 }
 
-inline void Logger::setDefaultLogfile(const char *logfile) { setDefaultLogfile(std::string(logfile)); }
+inline void Logger::path(const char *output) {
+    output = path().c_str();
+}
+inline void Logger::setPath(const char *path) { setPath(std::string(path)); }
 
 } // namespace Hlk
 
