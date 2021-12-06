@@ -20,28 +20,20 @@
  * 
  *****************************************************************************/
 
-#include "logger.h"
+#ifndef HLK_ABSTRACT_LOGGING_HANDLER_H
+#define HLK_ABSTRACT_LOGGING_HANDLER_H
+
+#include <string>
 
 namespace Hlk {
 
-/******************************************************************************
- * Constructors / Destructors
- *****************************************************************************/
+class AbstractLoggingHandler {
+public:
+    virtual ~AbstractLoggingHandler() = default;
 
-Logger::~Logger() {
-    m_handlers.clear();
-}
-
-/******************************************************************************
- * Methods
- *****************************************************************************/
-
-void Logger::write(const std::string &message) {
-    auto formattedMessage = m_messageBuilder->build(message);
-
-    for (size_t i = 0; i < m_handlers.size(); ++i) {
-        m_handlers[i]->write(formattedMessage);
-    }
-}
+    virtual void write(const std::string &message) = 0;
+};
 
 } // namespace Hlk
+
+#endif // HLK_ABSTRACT_LOGGING_HANDLER_H

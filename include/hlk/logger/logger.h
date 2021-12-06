@@ -20,101 +20,81 @@
  * 
  *****************************************************************************/
 
-#ifndef HLK_LOG_H
-#define HLK_LOG_H
+#ifndef HLK_LOGGER_H
+#define HLK_LOGGER_H
 
-#include <string>
+#include "abstractmessagebuilder.h"
+#include "abstractlogginghandler.h"
+
+#include <vector>
+#include <memory>
 
 namespace Hlk {
 
 class Logger {
 public:
     /**************************************************************************
+     * Constructors / Destructors
+     *************************************************************************/
+
+    ~Logger();
+
+    /**************************************************************************
      * Methods
      *************************************************************************/
 
-    /**
-     * @brief Write formatted message to stdout and file
-     * 
-     * Formatted message sample: 
-     * "2021-10-10 11:40:02 [info] - Measured weight: 138g."
-     * 
-     * If formatted message size bigger than sizeLimit(...), then message 
-     * will not be saved into the file
-     * 
-     * @param prefix The message prefix, printed in square brackets before the 
-     * message 
-     * @param message Main message
-     * @param logfile Log filename. If path(...) is empty, default path will be 
-     * used
-     */
-    static void write(const std::string &prefix, const std::string &message, const std::string &logfile = "");
+    void write(const std::string &message);    
+    void pushHandler(std::shared_ptr<AbstractLoggingHandler> handler);
 
     /**************************************************************************
      * Accessors / Mutators
      *************************************************************************/
 
-    static std::string path();
-    static void setPath(const std::string &path);
-
-    static unsigned int sizeLimit();
-    static void setSizeLimit(unsigned int bytes);
-
-    static unsigned int oldLogsLimit();
-    static void setOldLogsLimit(unsigned int count);
+    std::shared_ptr<AbstractMessageBuilder> messageBuilder() const;
+    void setMessageBuilder(std::shared_ptr<AbstractMessageBuilder> builder);
 
     /**************************************************************************
      * Helpers
      *************************************************************************/
 
-    static void write(const char *prefix, const char *message, const char *logfile);
-
-    static void path(const char *output);
-    static void setPath(const char *path);
+    void write(const char *message);
 
 protected:
-    /**************************************************************************
-     * Methods
-     *************************************************************************/
-
-    static std::string formatTime();
-    static std::string formatDate();
-    static void rotate(const std::string &logfile);
-
     /**************************************************************************
      * Members
      *************************************************************************/
 
-    static std::string m_path;
-    static unsigned int m_sizeLimit;
-    static unsigned int m_backupLimit;
+    std::shared_ptr<AbstractMessageBuilder> m_messageBuilder = nullptr;
+    std::vector<std::shared_ptr<AbstractLoggingHandler>> m_handlers;
 
 }; // class Logger
 
 /******************************************************************************
- * Inline definition: Accessors / Mutators
+ * Inline definition: Methods
  *****************************************************************************/
 
-inline std::string Logger::path() { return m_path; }
+inline void Logger::pushHandler(std::shared_ptr<AbstractLoggingHandler> handler) {
+    m_handlers.emplace_back(handler);
+}
 
-inline unsigned int Logger::sizeLimit() { return m_sizeLimit; }
-inline void Logger::setSizeLimit(unsigned int bytes) { m_sizeLimit = bytes; }
+/******************************************************************************
+ * Inline definition: Accessors / Mutators
+ *****************************************************************************/ 
 
-inline unsigned int Logger::oldLogsLimit() { return m_backupLimit; }
+inline std::shared_ptr<AbstractMessageBuilder> Logger::messageBuilder() const {
+    return m_messageBuilder;
+}
+
+inline void Logger::setMessageBuilder(std::shared_ptr<AbstractMessageBuilder> builder) { 
+    m_messageBuilder = builder;
+}
 
 /******************************************************************************
  * Inline definition: Helpers
  *****************************************************************************/
 
-inline void Logger::write(const char *prefix, const char *message, const char *logfile) {
-    write(std::string(prefix), std::string(message), std::string(logfile));
-}
-
-inline void Logger::path(const char *output) {
-    output = path().c_str();
-}
-inline void Logger::setPath(const char *path) { setPath(std::string(path)); }
+inline void Logger::write(const char *message) { write(std::string(message)); }
 
 } // namespace Hlk
 
-#endif // HLK_LOG_H
+#endif // HLK_LOGGER_H

@@ -20,28 +20,56 @@
  * 
  *****************************************************************************/
 
-#include "logger.h"
+#include "commonmessagebuilder.h"
 
 namespace Hlk {
 
 /******************************************************************************
- * Constructors / Destructors
+ * Accessors / Mutators
  *****************************************************************************/
 
-Logger::~Logger() {
-    m_handlers.clear();
+void CommonMessageBuilder::setLoggingLevel(LoggingLevel loggingLevel) {
+    switch (loggingLevel) {
+    case kDebug:
+        m_loggingLevel = "[debug]";
+        break;
+    case kError:
+        m_loggingLevel = "[err]";
+        break;
+    case kWarning:
+        m_loggingLevel = "[warn]";
+        break;
+    case kInfo:
+        m_loggingLevel = "[info]";
+        break;
+    }
+}
+
+void CommonMessageBuilder::setLoggingLevel(const std::string &loggingLevel) {
+    m_loggingLevel = "[" + loggingLevel + "]";
 }
 
 /******************************************************************************
- * Methods
+ * Protected methods
  *****************************************************************************/
 
-void Logger::write(const std::string &message) {
-    auto formattedMessage = m_messageBuilder->build(message);
+std::string CommonMessageBuilder::formatTime() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    char hour[3], min[3], sec[3]; // Two digits and null-terminator
+    sprintf(hour, "%02d", ltm->tm_hour);
+    sprintf(min, "%02d", ltm->tm_min);
+    sprintf(sec, "%02d", ltm->tm_sec);
+    return std::string(hour) + ":" + min + ":" + sec;
+}
 
-    for (size_t i = 0; i < m_handlers.size(); ++i) {
-        m_handlers[i]->write(formattedMessage);
-    }
+std::string CommonMessageBuilder::formatDate() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    char day[3], month[3]; // Two digits and null-terminator
+    sprintf(day, "%02hhu", ltm->tm_mday);
+    sprintf(month, "%02hhu", ltm->tm_mon + 1);
+    return std::to_string(1900 + ltm->tm_year) + "-" + month + "-" + day;
 }
 
 } // namespace Hlk

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(HlkLogger VERSION 2.0.0)
+project(HlkLogger VERSION 3.0.0)
 
 option(BUILD_EXAMPLES "Build examples" ON)
 

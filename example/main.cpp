@@ -1,13 +1,38 @@
 #include <hlk/logger/logger.h>
+#include <hlk/logger/commonmessagebuilder.h>
+#include <hlk/logger/terminallogginghandler.h>
+#include <hlk/logger/filerotatelogginghandler.h>
 
 int main(int argc, char* argv[]) {
-    Hlk::Logger::setPath("log");
-    Hlk::Logger::setOldLogsLimit(3);
-    Hlk::Logger::setSizeLimit(300);
+    // Configure builder
+    auto commonInfoMessageBuilder = std::shared_ptr<Hlk::CommonMessageBuilder>(new Hlk::CommonMessageBuilder());
+    auto commonErrMessageBuilder = std::shared_ptr<Hlk::CommonMessageBuilder>(new Hlk::CommonMessageBuilder());
+    commonErrMessageBuilder->setLoggingLevel(Hlk::CommonMessageBuilder::kError);
 
-    Hlk::Logger::write("info", "Program started", "common.log");
-    Hlk::Logger::write("warn", "Some file not exists, created", "common.log");
-    Hlk::Logger::write("err", "Resource not found", "common.log");
+    // Configure handlers
+    auto fileRotateLoggingHandler = std::shared_ptr<Hlk::FileRotateLoggingHandler>(new Hlk::FileRotateLoggingHandler());
+    fileRotateLoggingHandler->setLogFilename("log/common.log");
+    fileRotateLoggingHandler->setLogSizeLimit(300);
+    fileRotateLoggingHandler->setLogsCountLimit(3);
+
+    auto terminalLoggingHandler = std::shared_ptr<Hlk::TerminalLoggingHandler>(new Hlk::TerminalLoggingHandler());
+
+    // Configure loggers
+
+    Hlk::Logger commonInfoLogger;
+    Hlk::Logger commonErrorLogger;
+    
+    commonInfoLogger.setMessageBuilder(commonInfoMessageBuilder);
+    commonInfoLogger.pushHandler(terminalLoggingHandler);
+    commonInfoLogger.pushHandler(fileRotateLoggingHandler);
+
+    commonErrorLogger.setMessageBuilder(commonErrMessageBuilder);
+    commonErrorLogger.pushHandler(terminalLoggingHandler);
+    commonErrorLogger.pushHandler(fileRotateLoggingHandler);
+
+    // Write logs
+    commonInfoLogger.write("My info message");
+    commonErrorLogger.write("My error message");
     
     return 0;
 }

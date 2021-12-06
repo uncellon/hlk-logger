@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 3.0.0 - 2021-12-06
+
+### Added
+- Support for custom log handlers.
+- TerminalLoggerHandler for print in terminal.
+- FileLoggingHandler for writting messages to file.
+- FileRotateLoggingHandler for writting messages to file with log rotate support.
+- Support for custom message builders.
+- CommonMessageBuilder for writting messages in format: "2021-12-06 09:59:45 [info] - My message".
+
 ## 2.0.0 - 2021-10-29
 ### Added
 - Ability to specify a name for the log file.
