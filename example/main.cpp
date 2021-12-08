@@ -2,6 +2,7 @@
 #include <hlk/logger/commonmessagebuilder.h>
 #include <hlk/logger/terminallogginghandler.h>
 #include <hlk/logger/filerotatelogginghandler.h>
+#include <hlk/logger/loggermanager.h>
 
 int main(int argc, char* argv[]) {
     // Configure builder
@@ -34,5 +35,10 @@ int main(int argc, char* argv[]) {
     commonInfoLogger.write("My info message");
     commonErrorLogger.write("My error message");
     
+    auto log = Hlk::LoggerManager::createInstance("my-log");
+    log->setMessageBuilder(commonErrMessageBuilder);
+    log->pushHandler(terminalLoggingHandler);
+    log->write("My error from registered log");
+
     return 0;
 }
