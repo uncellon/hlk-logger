@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## 3.0.1 - 2021-12-08
+## 3.0.2 - 2021-12-08
+### Added
+- MiniLog to simple write message into cout and file.
 
+## 3.0.1 - 2021-12-08
 ### Added
 - LoggerManager for static allocate loggers. This should make it easier to instantiate the logging class in another class.
 

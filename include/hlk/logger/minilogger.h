@@ -20,49 +20,36 @@
  * 
  *****************************************************************************/
 
-#ifndef HLK_COMMON_MESSAGE_BUILDER_H
-#define HLK_COMMON_MESSAGE_BUILDER_H
+#ifndef MINI_LOGGER_H
+#define MINI_LOGGER_H
 
-#include "abstractmessagebuilder.h"
+#include <string>
 
 namespace Hlk {
 
-class CommonMessageBuilder : public AbstractMessageBuilder {
+class MiniLogger {
 public:
-    enum LoggingLevel {
-        kDebug,
-        kInfo,
-        kWarning,
-        kError
-    };
-
     /**************************************************************************
      * Methods
      *************************************************************************/
 
-    virtual std::string build(const std::string &message) override {
-        std::string currentDate = formatCurrentDate(), currentTime = formatCurrentTime();
-        return currentDate + " " + currentTime + " " + m_loggingLevel + " - " + message;
-    }
-
-    static std::string formatCurrentTime();
-    static std::string formatCurrentDate();
+    static void write(const std::string &level, const std::string &path, const std::string &message);
 
     /**************************************************************************
      * Accessors / Mutators
      *************************************************************************/
 
-    void setLoggingLevel(LoggingLevel loggingLevel);
-    void setLoggingLevel(const std::string &loggingLevel);
+    static unsigned int logSizeLimit();
+    static void setLogSizeLimit(unsigned int bytes);
+
+    static unsigned int logsCountLimit();
+    static void setLogsCountLimit(unsigned int count);
 
 protected:
-    /**************************************************************************
-     * Members
-     *************************************************************************/
-
-    std::string m_loggingLevel = "[info]";
+    static unsigned int m_logSizeLimit;
+    static unsigned int m_logsCountLimit;
 };
 
-} // namespace Hlk
+}
 
-#endif // HLK_COMMON_MESSAGE_BUILDER_H
+#endif // MINI_LOGGER_H

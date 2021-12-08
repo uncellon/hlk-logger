@@ -3,6 +3,7 @@
 #include <hlk/logger/terminallogginghandler.h>
 #include <hlk/logger/filerotatelogginghandler.h>
 #include <hlk/logger/loggermanager.h>
+#include <hlk/logger/minilogger.h>
 
 int main(int argc, char* argv[]) {
     // Configure builder
@@ -39,6 +40,8 @@ int main(int argc, char* argv[]) {
     log->setMessageBuilder(commonErrMessageBuilder);
     log->pushHandler(terminalLoggingHandler);
     log->write("My error from registered log");
+
+    Hlk::MiniLogger::write("info", "log/mini.log", "My message from MiniLog");
 
     return 0;
 }

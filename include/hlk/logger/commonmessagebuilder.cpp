@@ -25,6 +25,29 @@
 namespace Hlk {
 
 /******************************************************************************
+ * Methods
+ *****************************************************************************/
+
+std::string CommonMessageBuilder::formatCurrentTime() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    char hour[3], min[3], sec[3]; // Two digits and null-terminator
+    sprintf(hour, "%02d", ltm->tm_hour);
+    sprintf(min, "%02d", ltm->tm_min);
+    sprintf(sec, "%02d", ltm->tm_sec);
+    return std::string(hour) + ":" + min + ":" + sec;
+}
+
+std::string CommonMessageBuilder::formatCurrentDate() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    char day[3], month[3]; // Two digits and null-terminator
+    sprintf(day, "%02hhu", ltm->tm_mday);
+    sprintf(month, "%02hhu", ltm->tm_mon + 1);
+    return std::to_string(1900 + ltm->tm_year) + "-" + month + "-" + day;
+}
+
+/******************************************************************************
  * Accessors / Mutators
  *****************************************************************************/
 
@@ -47,29 +70,6 @@ void CommonMessageBuilder::setLoggingLevel(LoggingLevel loggingLevel) {
 
 void CommonMessageBuilder::setLoggingLevel(const std::string &loggingLevel) {
     m_loggingLevel = "[" + loggingLevel + "]";
-}
-
-/******************************************************************************
- * Protected methods
- *****************************************************************************/
-
-std::string CommonMessageBuilder::formatTime() {
-    time_t now = time(0);
-    tm *ltm = localtime(&now);
-    char hour[3], min[3], sec[3]; // Two digits and null-terminator
-    sprintf(hour, "%02d", ltm->tm_hour);
-    sprintf(min, "%02d", ltm->tm_min);
-    sprintf(sec, "%02d", ltm->tm_sec);
-    return std::string(hour) + ":" + min + ":" + sec;
-}
-
-std::string CommonMessageBuilder::formatDate() {
-    time_t now = time(0);
-    tm *ltm = localtime(&now);
-    char day[3], month[3]; // Two digits and null-terminator
-    sprintf(day, "%02hhu", ltm->tm_mday);
-    sprintf(month, "%02hhu", ltm->tm_mon + 1);
-    return std::to_string(1900 + ltm->tm_year) + "-" + month + "-" + day;
 }
 
 } // namespace Hlk
