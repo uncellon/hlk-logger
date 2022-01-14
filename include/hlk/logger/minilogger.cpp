@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include "minilogger.h"
-#include "commonmessagebuilder.h"
+#include "basicmessagelayout.h"
 
 #include <fstream>
 #include <iostream>
@@ -37,8 +37,8 @@ unsigned int MiniLogger::m_logsCountLimit = 5;
  *****************************************************************************/
 
 void MiniLogger::write(const std::string &level, const std::string &path, const std::string &message) {
-    std::string currentDate = CommonMessageBuilder::formatCurrentDate();
-    std::string currentTime = CommonMessageBuilder::formatCurrentTime();
+    std::string currentDate = BasicMessageLayout::formatCurrentDate();
+    std::string currentTime = BasicMessageLayout::formatCurrentTime();
     std::string formattedMessage = currentDate + " " + currentTime + " [" + level + "] - " + message;
 
     std::cout << formattedMessage << std::endl;

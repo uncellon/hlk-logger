@@ -20,20 +20,28 @@
  * 
  *****************************************************************************/
 
-#ifndef HLK_ABSTRACT_MESSAGE_BUILDER_H
-#define HLK_ABSTRACT_MESSAGE_BUILDER_H
+#ifndef HLK_BASIC_MESSAGE_LAYOUT_H
+#define HLK_BASIC_MESSAGE_LAYOUT_H
 
 #include <string>
 
 namespace Hlk {
 
-class AbstractMessageBuilder {
+class BasicMessageLayout {
 public:
-    virtual ~AbstractMessageBuilder() = default;
+    /**************************************************************************
+     * Methods
+     *************************************************************************/
 
-    virtual std::string build(const std::string &message) = 0;
+    virtual std::string build(const std::string &prefix, const std::string &message) {
+        std::string currentDate = formatCurrentDate(), currentTime = formatCurrentTime();
+        return currentDate + " " + currentTime + " [" + prefix + "] - " + message;
+    }
+
+    static std::string formatCurrentTime();
+    static std::string formatCurrentDate();
 };
 
 } // namespace Hlk
 
-#endif // HLK_ABSTRACT_MESSAGE_BUILDER_H
+#endif // HLK_BASIC_MESSAGE_LAYOUT_H

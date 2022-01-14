@@ -23,77 +23,81 @@
 #ifndef HLK_LOGGER_H
 #define HLK_LOGGER_H
 
-#include "abstractmessagebuilder.h"
 #include "abstractlogginghandler.h"
 
+#include <map>
+#include <mutex>
 #include <vector>
 #include <memory>
 
 namespace Hlk {
 
+template<class TMessageLayout>
 class Logger {
 public:
     /**************************************************************************
      * Constructors / Destructors
      *************************************************************************/
 
-    ~Logger();
+    Logger() {
+        m_layout = std::shared_ptr<TMessageLayout>(new TMessageLayout());
+    }
+
+    ~Logger() {
+        m_handlers.clear();
+    }
 
     /**************************************************************************
      * Methods
      *************************************************************************/
 
-    void write(const std::string &message);    
-    void pushHandler(std::shared_ptr<AbstractLoggingHandler> handler);
+    template<class... TLayoutArgs>
+    void write(TLayoutArgs... args) {
+        auto formattedMessage = m_layout->build(args...);
+
+        for (size_t i = 0; i < m_handlers.size(); ++i) {
+            m_handlers[i]->write(formattedMessage);
+        }
+    }
+
+    void pushHandler(std::shared_ptr<AbstractLoggingHandler> handler) {
+        m_handlers.emplace_back(handler);
+    }
+
+    static Logger *getInstance(const std::string &name) {
+        std::unique_lock lock(m_instanceMutex);
+        if (m_loggersByNames.find(name) == m_loggersByNames.end()) {
+            m_loggersByNames[name] = new Logger();
+        }
+        return m_loggersByNames[name];
+    }
 
     /**************************************************************************
      * Accessors / Mutators
      *************************************************************************/
 
-    std::shared_ptr<AbstractMessageBuilder> messageBuilder() const;
-    void setMessageBuilder(std::shared_ptr<AbstractMessageBuilder> builder);
-
-    /**************************************************************************
-     * Helpers
-     *************************************************************************/
-
-    void write(const char *message);
+    std::shared_ptr<TMessageLayout> layout() const {
+        return m_layout;
+    }
 
 protected:
     /**************************************************************************
      * Members
      *************************************************************************/
 
-    std::shared_ptr<AbstractMessageBuilder> m_messageBuilder = nullptr;
+    std::shared_ptr<TMessageLayout> m_layout = nullptr;
     std::vector<std::shared_ptr<AbstractLoggingHandler>> m_handlers;
+
+    static std::mutex m_instanceMutex;
+    static std::map<std::string, Logger<TMessageLayout> *> m_loggersByNames;
 
 }; // class Logger
 
-/******************************************************************************
- * Inline definition: Methods
- *****************************************************************************/
+template<class TMessageLayout>
+std::mutex Logger<TMessageLayout>::m_instanceMutex;
 
-inline void Logger::pushHandler(std::shared_ptr<AbstractLoggingHandler> handler) {
-    m_handlers.emplace_back(handler);
-}
-
-/******************************************************************************
- * Inline definition: Accessors / Mutators
- *****************************************************************************/ 
-
-inline std::shared_ptr<AbstractMessageBuilder> Logger::messageBuilder() const {
-    return m_messageBuilder;
-}
-
-inline void Logger::setMessageBuilder(std::shared_ptr<AbstractMessageBuilder> builder) { 
-    m_messageBuilder = builder;
-}
-
-/******************************************************************************
- * Inline definition: Helpers
- *****************************************************************************/
-
-inline void Logger::write(const char *message) { write(std::string(message)); }
+template<class TMessageLayout>
+std::map<std::string, Logger<TMessageLayout> *> Logger<TMessageLayout>::m_loggersByNames;
 
 } // namespace Hlk
 

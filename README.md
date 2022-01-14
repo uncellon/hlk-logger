@@ -1,5 +1,52 @@
 # Homebrew Libraries Kit - Logger
 
+- [Description](#description)
+- [Prerequisites](#prerequisites)
+- [Examples](#examples)
+    - [MiniLogger](#minilogger)
+    - [Full example](#full-example)
+
+## Description
+
+Logging library for C++
+
+## Prerequisites
+
+- C++17 or higher
+- CMake >= 3.16
+
+## Examples
+
+### MiniLogger
+
+MiniLogger is helper class that provides quickly write messages to the std::cout and file (with rotation support).
+
+```cpp
+Hlk::MiniLogger::setLogSizeLimit(1000000); // 1 MB
+Hlk::MiniLogger::setLogsCountLimit(5); // 5 logs max
+
+Hlk::MiniLogger::write("WARN", "log/common.log", "Warn message");
+```
+
+### Full example
+
+```cpp
+auto logger = Hlk::Logger<Hlk::BasicMessageLayout>::getInstance("common");
+
+// Configure handlers
+auto tHandler = std::shared_ptr<Hlk::TerminalLoggingHandler>(new Hlk::TerminalLoggingHandler());
+
+auto frlHandler = std::shared_ptr<Hlk::FileRotateLoggingHandler>(new Hlk::FileRotateLoggingHandler());
+frlHandler->setLogFilename("log/common.log");
+frlHandler->setLogSizeLimit(1000000); // 1 MB
+frlHandler->setLogsCountLimit(5); // 5 logs max
+
+logger->addHandler(tHandler);
+logger->addHandler(frlHandler);
+
+logger->write("INFO", "My info message"); // Will print "2022-01-14 15:04:30 [INFO] - My info message" on the console
+```
+
 ## License
 <img align="right" src="https://www.gnu.org/graphics/lgplv3-with-text-154x68.png">
 

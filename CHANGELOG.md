@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 3.1.0 - 2022-01-14
+### Added
+- Now message layout depends on template argument.
+
+- Instance management now implemented in Logger class:
+```cpp
+auto logger = Hlk::Logger<Hlk::BasicMessageLayout>::getInstance("common");
+```
+instead of:
+```cpp
+auto logger = Hlk::LoggerManager::createInstance("common");
+```
+
+### Changed
+- CommonMessageBuilder renamed to BasicMessageLayout.
+
+### Deleted
+- AbstractMessageBuilder.
+- LoggerManager.
+
 ## 3.0.2 - 2021-12-08
 ### Added
 - MiniLog to simple write message into cout and file.
